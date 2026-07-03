@@ -10,3 +10,8 @@ A simple platform runner game developed using Pygame Zero.
 - Two enemy types
 - Win and Game Over screens
 - Sprite animations
+- 
+## Controls
+- A / D or ← / → : Move
+- W / ↑ / Space : Jump
+- S / ↓ : Duck
