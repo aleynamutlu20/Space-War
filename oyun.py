@@ -18,7 +18,7 @@ musicstate="ON"
 music.play("startmusic")
 meteors=[]
 meteor_timing=0
-lifes=3
+lives=3
 lasers=[]
 enemy=None
 game_timer=0
@@ -73,11 +73,12 @@ class Player:
         elif self.actor.right > 800:
             self.actor.right = 800
         
-        if (keyboard.space or keyboard.w or keyboard.up):
-            self.y_speed= self.jump_rate
-            self.inplatform=False
-            sounds.jump.play()
-        
+        if keyboard.space or keyboard.w or keyboard.up:
+            if self.actor.bottom >= 465: 
+                self.y_speed = self.jump_rate
+                self.inplatform = False
+                sounds.jump.play()
+
 
         
         self.y_speed += self.gravity
@@ -146,6 +147,7 @@ class Enemy:
         self.shoot_timer = 0
         self.life_timer=0
         self.isleaving=False
+        self.direction_y=2
 
     def action_enemy(self):
         
@@ -174,6 +176,12 @@ class Enemy:
                 self.shoot_timer = 0
                 sounds.lasersound.play()
 
+
+        self.actor.y += self.direction_y
+
+        if self.actor.y >= 250 or self.actor.y<=80:
+            self.direction_y *= -1
+
     def drawing_enemy(self):
         self.actor.draw()
 
@@ -195,13 +203,13 @@ class Laser:
 
 
 def reset():
-    global lifes
+    global lives
     global survived_time
     global game_timer
     global meteor_timing
     global enemy
 
-    lifes=3
+    lives=3
     survived_time=0
     game_timer=0
     meteor_timing=0
@@ -247,7 +255,7 @@ def draw():
         screen.draw.filled_rect(platform,(149,165,166))
         hero.drawing()
         screen.blit("lives",(30,30))
-        screen.draw.text(f"x {lifes}", (70, 30), fontsize=24, color="white")
+        screen.draw.text(f"x {lives}", (70, 30), fontsize=24, color="white")
         
 
         for m in meteors:
@@ -260,7 +268,7 @@ def draw():
         for l in lasers[:]:
             l.drawing_laser()
 
-        screen.draw.text(f"Süre: {int(survived_time)} / {win_time}", (650, 30), fontsize=24, color="white")
+        screen.draw.text(f"SÃ¼re: {int(survived_time)} / {win_time}", (650, 30), fontsize=24, color="white")
 
     elif gamestate=="gameover":
         screen.fill((24, 28, 56 ))
@@ -279,7 +287,6 @@ def draw():
 def on_mouse_down(pos):
     global gamestate
     global musicstate
-    global music
     if gamestate=="menu":
         if start.collidepoint(pos):
             gamestate="gamescreen"
@@ -316,7 +323,7 @@ def on_mouse_down(pos):
 def update():
     global gamestate
     global meteor_timing
-    global lifes
+    global lives
     global game_timer
     global enemy
     global survived_time
@@ -334,7 +341,7 @@ def update():
             lasers.clear()
             meteors.clear() 
             enemy = None
-            reset()
+            
         
     if hero.actor.colliderect(platform):
         hero.y_speed=0
@@ -355,11 +362,11 @@ def update():
         m.action_meteor()
 
         if hero.actor.colliderect(m.actor):
-            lifes-=1
+            lives-=1
             meteors.remove(m)
 
 
-            if lifes==0:
+            if lives==0:
                 gamestate="gameover"
                 sounds.gameover.play()
                 music.stop()
@@ -384,10 +391,10 @@ def update():
         
         if hero.actor.colliderect(l.actor):
             
-            lifes -=1
+            lives -=1
             lasers.remove(l)
             
-            if lifes==0:
+            if lives==0:
                 gamestate="gameover"
                 sounds.gameover.play()
                 lasers.clear()
